@@ -58,4 +58,5 @@ const logout = async (req, res) => {
 export default {
   signup: ctrlWrapper(signup),
   login: ctrlWrapper(login),
+  logout: ctrlWrapper(logout),
 };
