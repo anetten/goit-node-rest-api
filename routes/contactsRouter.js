@@ -8,6 +8,8 @@ import {
   updateFavorite,
 } from "../controllers/contactsControllers.js";
 
+import upload from "../middlewares/upload.js";
+
 import isValidId from "../middlewares/isValidId.js";
 
 import authenticate from "../middlewares/authenticate.js";
@@ -22,7 +24,7 @@ contactsRouter.get("/:id", isValidId, getOneContact);
 
 contactsRouter.delete("/:id", isValidId, deleteContact);
 
-contactsRouter.post("/", createContact);
+contactsRouter.post("/", upload.single("avatar"), createContact);
 
 contactsRouter.put("/:id", isValidId, updateContact);
 
