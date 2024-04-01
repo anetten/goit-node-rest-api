@@ -7,40 +7,33 @@ import ctrlWrapper from "../decorators/ctrlWrapper.js";
 import HttpError from "../helpers/HttpError.js";
 
 import fs from "fs/promises";
-import dotenv, { config } from "dotenv";
 import gravatar from "gravatar";
 import path from "path";
 import Jimp from "jimp";
-import bcrypt from "bcrypt";
-
-dotenv.config();
 
 const { JWT_SECRET } = process.env;
 
 const avatarsDir = path.resolve("public", "avatars");
 
-// const bcrypt = require("bcrypt");
-
 const signup = async (req, res) => {
-  const { email, password } = req.body;
+  const { email } = req.body;
   const user = await authService.findUser({ email });
 
   if (user) {
     throw HttpError(409, "Email in use");
   }
 
-  const hashPassword = await bcrypt.hash(password, 10);
   const avatarURL = gravatar.url(email);
 
   const newUser = await authService.signup({
     ...req.body,
-    password: hashPassword,
     avatarURL,
   });
 
   res.status(201).json({
     username: newUser.username,
     email: newUser.email,
+    avatarURL,
   });
 };
 
@@ -50,16 +43,17 @@ const login = async (req, res) => {
 
   console.log(user);
   if (!user) {
-    throw HttpError(401, "Email or password valid");
+    throw HttpError(401, "Email or password invalid");
   }
+
   const comparePassword = await authService.validatePassword(
     password,
     user.password
   );
-
   console.log(comparePassword);
+
   if (!comparePassword) {
-    throw HttpError(401, "Email or password valid");
+    throw HttpError(401, "Email or password invalid");
   }
 
   const { _id: id } = user;
@@ -109,7 +103,7 @@ const updateAvatar = async (req, res) => {
   await fs.unlink(tempUpload);
   const avatarURL = path.join("avatars", filename);
   console.log("avatarURL", avatarURL);
-  await authService.updateUser.findByIdAndUpdate(_id, { avatarURL });
+  await authService.updateUser(_id, { avatarURL });
 
   res.json({
     avatarURL,

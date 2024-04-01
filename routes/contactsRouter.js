@@ -24,7 +24,7 @@ contactsRouter.get("/:id", isValidId, getOneContact);
 
 contactsRouter.delete("/:id", isValidId, deleteContact);
 
-contactsRouter.post("/", upload.single("avatar"), createContact);
+contactsRouter.post("/", isValidId, createContact);
 
 contactsRouter.put("/:id", isValidId, updateContact);
 
