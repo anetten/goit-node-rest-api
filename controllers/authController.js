@@ -7,14 +7,19 @@ import ctrlWrapper from "../decorators/ctrlWrapper.js";
 import HttpError from "../helpers/HttpError.js";
 
 import fs from "fs/promises";
-import dotenv from "dotenv";
+import dotenv, { config } from "dotenv";
 import gravatar from "gravatar";
 import path from "path";
 import Jimp from "jimp";
+import bcrypt from "bcrypt";
+
+dotenv.config();
 
 const { JWT_SECRET } = process.env;
 
 const avatarsDir = path.resolve("public", "avatars");
+
+// const bcrypt = require("bcrypt");
 
 const signup = async (req, res) => {
   const { email, password } = req.body;
@@ -43,6 +48,7 @@ const login = async (req, res) => {
   const { email, password } = req.body;
   const user = await authService.findUser({ email });
 
+  console.log(user);
   if (!user) {
     throw HttpError(401, "Email or password valid");
   }
@@ -50,6 +56,8 @@ const login = async (req, res) => {
     password,
     user.password
   );
+
+  console.log(comparePassword);
   if (!comparePassword) {
     throw HttpError(401, "Email or password valid");
   }
@@ -101,7 +109,7 @@ const updateAvatar = async (req, res) => {
   await fs.unlink(tempUpload);
   const avatarURL = path.join("avatars", filename);
   console.log("avatarURL", avatarURL);
-  await User.findByIdAndUpdate(_id, { avatarURL });
+  await authService.updateUser.findByIdAndUpdate(_id, { avatarURL });
 
   res.json({
     avatarURL,
