@@ -8,7 +8,11 @@ import authenticate from "../middlewares/authenticate.js";
 
 import upload from "../middlewares/upload.js";
 
-import { userLoginSchema, userSignupSchema } from "../schemas/userSchemas.js";
+import {
+  userEmailSchema,
+  userLoginSchema,
+  userSignupSchema,
+} from "../schemas/userSchemas.js";
 
 const authRouter = express.Router();
 
@@ -19,6 +23,14 @@ authRouter.post(
 );
 
 authRouter.post("/login", validateBody(userLoginSchema), authController.login);
+
+authRouter.get("/verify/:verificationToken", authController.verify);
+
+authRouter.post(
+  "/verify",
+  validateBody(userEmailSchema),
+  authController.resendVerify
+);
 
 authRouter.get("/current", authenticate, authController.getCurrent);
 
